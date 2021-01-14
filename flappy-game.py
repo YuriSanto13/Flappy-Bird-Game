@@ -39,6 +39,7 @@ class Bird(pygame.sprite.Sprite):
     def bump(self):
         self.speed = -SPEED
 
+
 # Object Pipe
 class Pipe(pygame.sprite.Sprite):
     def __init__(self, inverted, xpos, ysize):
@@ -82,19 +83,20 @@ def get_random_pipes(xpos):
     pipe_inverted = Pipe(True, xpos, SCREEN_HEIGHT - size - PIPE_GAP)
     return (pipe, pipe_inverted)
 
+ 
+
 # Set screen game
 pygame.init()
 screen= pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT ))
 BACKGROUND = pygame.image.load('assets/sprites/background-day.png')
 GAME_OVER = pygame.image.load('assets/sprites/gameover.png')
+MENU = pygame.image.load('assets/sprites/message(286x512).png')
 bird_group = pygame.sprite.Group()
 bird = Bird()
 bird_group.add(bird)
 ground_group = pygame.sprite.Group()
 pipe_group = pygame.sprite.Group()
-point_group = pygame.sprite.Group()
-point = points()
-point_group.add(point)
+
 
 for i in range (2):
     pipes = get_random_pipes(SCREEN_WIDTH * i + 800)
@@ -107,37 +109,56 @@ for i in range(2):
 
 clock = pygame.time.Clock()
 
-while True:
-    clock.tick(40)
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            pygame.quit()
-        if event.type == KEYDOWN:
-            if event.key == K_SPACE:
-                bird.bump()
-    screen.blit(BACKGROUND, (0, 0))
-    if is_off_screen(ground_group.sprites()[0]):
-        ground_group.remove(ground_group.sprites()[0])
-        new_ground = Ground(GROUND_WIDTH - 8)
-        ground_group.add(new_ground)
-    if is_off_screen(pipe_group.sprites()[0]):
-        pipe_group.remove(pipe_group.sprites()[0])
-        pipe_group.remove(pipe_group.sprites()[0])
-        pipes = get_random_pipes(SCREEN_WIDTH * 2)
-        pipe_group.add(pipes[0])
-        pipe_group.add(pipes[1])
-    
-    bird_group.update()
-    ground_group.update()
-    pipe_group.update()
-    pipe_group.draw(screen)
-    ground_group.draw(screen)
-    bird_group.draw(screen)
-    pygame.display.update()
-    if (pygame.sprite.groupcollide(bird_group, ground_group, False, False, pygame.sprite.collide_mask) or
-    pygame.sprite.groupcollide(bird_group, pipe_group, False, False, pygame.sprite.collide_mask)):
-        # Game over 
-        screen.blit(GAME_OVER, (47, SCREEN_HEIGHT/2))
+def Menu():
+    start = True
+    while start:
+        clock.tick(40)
+        screen.blit(BACKGROUND, (0, 0))
+        screen.blit(MENU, (0, 0))
         pygame.display.update()
-        sleep(10)
-        break
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+            if event.type == MOUSEBUTTONDOWN:
+                start = False
+    Game()
+
+def Game():
+    while True:
+        clock.tick(40)
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+            if event.type == KEYDOWN:
+                if event.key == K_SPACE:
+                    bird.bump()
+        screen.blit(BACKGROUND, (0, 0))
+        if is_off_screen(ground_group.sprites()[0]):
+            ground_group.remove(ground_group.sprites()[0])
+            new_ground = Ground(GROUND_WIDTH - 8)
+            ground_group.add(new_ground)
+        if is_off_screen(pipe_group.sprites()[0]):
+            pipe_group.remove(pipe_group.sprites()[0])
+            pipe_group.remove(pipe_group.sprites()[0])
+            pipes = get_random_pipes(SCREEN_WIDTH * 2)
+            pipe_group.add(pipes[0])
+            pipe_group.add(pipes[1])
+        
+        
+        bird_group.update()
+        ground_group.update()
+        pipe_group.update()
+        pipe_group.draw(screen)
+        ground_group.draw(screen)
+        bird_group.draw(screen)
+        pygame.display.update()
+        if (pygame.sprite.groupcollide(bird_group, ground_group, False, False, pygame.sprite.collide_mask) or
+        pygame.sprite.groupcollide(bird_group, pipe_group, False, False, pygame.sprite.collide_mask)):
+            # Game over 
+            screen.blit(GAME_OVER, (47, SCREEN_HEIGHT/2))
+            pygame.display.update()
+            sleep(5)
+            break
+            
+
+Menu()
